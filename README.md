@@ -27,24 +27,6 @@ Jet-Posts is built using the MERN stack:
 *   Multer (handles those image uploads)
 *   JWT (keeps authentication secure)
 
-## 📁 Project Structure (Planned)
-
-Here's a look at how the project is organized:
-jet-posts/
-├── client/ # React frontend lives here
-│ ├── public/
-│ └── src/
-│ ├── components/
-│ ├── pages/
-│ └── ...
-├── server/ # Node.js backend lives here
-│ ├── models/
-│ ├── routes/
-│ ├── controllers/
-│ └── ...
-├── .env # API keys and secrets go here (don't commit!)
-└── README.md
-
 ## ⚙️ Get It Running
 
 Ready to try it out locally or contribute?
