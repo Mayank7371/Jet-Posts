@@ -1,72 +1,69 @@
-const express = require("express")
-const jwt = require("jsonwebtoken")
+const express = require("express");
+const jwt = require("jsonwebtoken");
 require('dotenv').config();
-const port  = process.env.PORT || 4000
-const app = express()
-app.use(express.json())
-
-const users =[]
+const app = express();
+const port = process.env.PORT || 5000
+const seceret = process.env.seceret;
 let foundUser = null;
-let token = null;
-app.get("/nothing", (req,res)=>{
-    res.send("you have sent nothing")
+app.use(express.json());
+let users= [];
+function auth(req,res,next){
+    try {
+        let token = req.headers.token;
+        const decodedData = jwt.verify(token, process.env.seceret);
+        if(decodedData){
+            res.send("You are logged in")
+        }else{
+            res.end("You are not logged in...")
+        }
+
+    } catch (error) {
+       res.send("You are not logged in, please sign in to continue..", error )
+    }
+    next()
+}
+
+app.get("/", (req,res,next)=>{
+    res.send("hi the server is online...")
+    next()
 })
 app.post("/signup", (req,res,next)=>{
-    const {username,password} = req.body;
-    users.push({
+    const { username , password }= req.body;
+    users.push(({
         username,
         password
-    })
+    }))
     res.json({
-        message: "You are now registered!"
+        Message:"You are now registered, please sign in to continue..."
     })
-    console.log(users);
-    next()
-
+    next();
 })
 app.post("/signin", (req,res,next)=>{
-    const {username,password} = req.body;
-    for(let i = 0; i<users.length; i++){
-        if(users[i].username == username && users[i].password == password){
-            foundUser = users[i];
-        }
+    let {username} = req.body
+    console.log();
+    
+    for (let i = 0; i < users.length; i++) {
+        foundUser = users[i]   
     }
-    console.log(users);
-    if(!foundUser){
-        res.json("incorrect credentials")
-    }else{
-        token = jwt.sign({
-            username,
-            password
-        },process.env.seceret)
-    }
-    res.json({
-        token
-    })
-    next()
-})
-// now this one will be an authenticated endpoint -> means where you need to have a token or you need to 
-// be signed in then only can you access it.
-
-app.get("/me", (req,res)=>{
-    const token = req.headers.token;
-    const decodedData = jwt.verify(token , process.env.seceret);
-    if(decodedData.username){
-      for(let i = 0; i<users.length; i++){
-        foundUser = users[i]
-      }
-      res.json({
-        username: foundUser.username,
-        password: foundUser.password
-      })
+    if(foundUser){
+        let token= jwt.sign({
+            username: username
+        },seceret);
+        res.json({
+            token,
+        })
     }else{
         res.json({
-            message: "Your credentials are incorrect"
+            message: "You have entered invalid credentials..."
         })
     }
+    next();
+})
+app.post("/me", auth, (req,res,next)=>{
+    next();
 })
 
-app.listen(process.env.PORT, ()=>{
-    console.log(`App is listening on port ${process.env.PORT}`);
+app.listen(port,()=>{
+    console.log(`server is running on port ${port}`);
     
 })
